@@ -2,7 +2,7 @@ using DBHosting.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
+string DEVELOPERDASHBOARD_DBCONNECTIONSTRING = $"Server={Environment.GetEnvironmentVariable("PGHOST")};Database={Environment.GetEnvironmentVariable("DATABASE_URL")};Port={Environment.GetEnvironmentVariable("PGPORT")};Username={Environment.GetEnvironmentVariable("POSTGRES_USER")};Password={Environment.GetEnvironmentVariable("PGPASSWORD")}";
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -10,7 +10,7 @@ builder.Services.AddDbContext<DBDeployContext>(
     options =>
         options
             .UseNpgsql(
-                builder.Configuration["DBDeploy_DBCONNECTIONSTRING"]
+                DEVELOPERDASHBOARD_DBCONNECTIONSTRING
                     ?? throw new InvalidOperationException(
                         "Connection string 'DBHostingDB' not found."
                     )
@@ -19,7 +19,11 @@ builder.Services.AddDbContext<DBDeployContext>(
 );
 
 var app = builder.Build();
-
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<DBDeployContext>();
+    dbContext.Database.Migrate();
+}
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
