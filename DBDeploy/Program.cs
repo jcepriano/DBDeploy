@@ -1,7 +1,17 @@
 using DBHosting.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
+
+{
+
+    Args = args,
+
+    ContentRootPath = "/app/out",
+
+    WebRootPath = "wwwroot",
+
+}); 
 string DEVELOPERDASHBOARD_DBCONNECTIONSTRING = $"Server={Environment.GetEnvironmentVariable("PGHOST")};Database={Environment.GetEnvironmentVariable("DATABASE_URL")};Port={Environment.GetEnvironmentVariable("PGPORT")};Username={Environment.GetEnvironmentVariable("POSTGRES_USER")};Password={Environment.GetEnvironmentVariable("PGPASSWORD")}";
 // Add services to the container.
 builder.Services.AddControllersWithViews();
